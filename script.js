@@ -14,12 +14,12 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 async function loadNavbarAndFooter() {
     try {
         // Загружаем навбар
-        const navbarResponse = await fetch('/navbar.html');
+        const navbarResponse = await fetch('navbar.html');
         const navbarHtml = await navbarResponse.text();
         document.getElementById('navbar-placeholder').innerHTML = navbarHtml;
         
         // Загружаем футер
-        const footerResponse = await fetch('/footer.html');
+        const footerResponse = await fetch('footer.html');
         const footerHtml = await footerResponse.text();
         document.getElementById('footer-placeholder').innerHTML = footerHtml;
     } catch (error) {
@@ -178,7 +178,7 @@ async function registerUser(username, password, robloxNick) {
 function logout() {
     currentUser = null;
     clearSession();
-    window.location.href = '/index.html';
+    window.location.href = 'index.html';
 }
 
 // ========== УТИЛИТЫ ==========
