@@ -1,6 +1,6 @@
 // ========== НАСТРОЙКИ SUPABASE ==========
-const SUPABASE_URL = 'https://твой-проект.supabase.co'; // ЗАМЕНИ!
-const SUPABASE_KEY = 'твой-публичный-ключ'; // ЗАМЕНИ!
+const SUPABASE_URL = 'https://ygpczdorqtoxchgwtcdu.supabase.co'; // ЗАМЕНИ!
+const SUPABASE_KEY = 'sb_publishable_QWZrAGxsXt0xtot2lFdz3A_tOWokALJ'; // ЗАМЕНИ!
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
