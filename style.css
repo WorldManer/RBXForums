@@ -10,7 +10,6 @@ body {
     color: #333;
 }
 
-/* Навигация */
 .navbar {
     background-color: #1a1a2e;
     color: white;
@@ -42,14 +41,63 @@ body {
     color: #00d4ff;
 }
 
-/* Основной контейнер */
 .container {
     max-width: 1200px;
     margin: 2rem auto;
     padding: 0 1rem;
 }
 
-/* Карточки особенностей */
+.auth-container {
+    max-width: 400px;
+    margin: 2rem auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #555;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #00d4ff;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+    width: 100%;
+}
+
+.btn-primary {
+    background-color: #00d4ff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #00b8d9;
+}
+
 .features {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -70,250 +118,12 @@ body {
     margin-bottom: 1rem;
 }
 
-/* Формы аутентификации */
-.auth-container {
-    max-width: 400px;
-    margin: 2rem auto;
-    background: white;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-.form-group {
-    margin-bottom: 1rem;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: #555;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 1rem;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-    outline: none;
-    border-color: #00d4ff;
-}
-
-.btn {
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 5px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-.btn-primary {
-    background-color: #00d4ff;
-    color: white;
-}
-
-.btn-primary:hover {
-    background-color: #00b8d9;
-}
-
-.btn-danger {
-    background-color: #ff4444;
-    color: white;
-}
-
-.btn-danger:hover {
-    background-color: #cc0000;
-}
-
-/* Форум */
-.forum-categories {
-    margin-top: 2rem;
-}
-
-.category {
-    background: white;
-    border-radius: 10px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-.category h2 {
-    color: #1a1a2e;
-    border-bottom: 2px solid #00d4ff;
-    padding-bottom: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.topics {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.topic {
-    background: #f8f9fa;
-    padding: 1rem;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.topic:hover {
-    transform: translateX(5px);
-    background: #e9ecef;
-}
-
-.topic h3 {
-    color: #1a1a2e;
-    margin-bottom: 0.5rem;
-}
-
-.topic p {
-    color: #6c757d;
-    font-size: 0.9rem;
-}
-
-.create-topic {
-    background: white;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    margin-top: 2rem;
-}
-
-.create-topic h3 {
-    color: #1a1a2e;
-    margin-bottom: 1rem;
-}
-
-/* Админ панель */
-.admin-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.stat-card {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+h1 {
     text-align: center;
-}
-
-.stat-card h3 {
-    color: #6c757d;
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
-}
-
-.stat-card p {
-    color: #1a1a2e;
-    font-size: 2rem;
-    font-weight: bold;
-}
-
-.admin-panel {
-    background: white;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-.admin-section {
-    margin-bottom: 2rem;
-}
-
-.admin-section h2 {
-    color: #1a1a2e;
     margin-bottom: 1rem;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-th, td {
-    padding: 0.75rem;
-    text-align: left;
-    border-bottom: 1px solid #dee2e6;
-}
-
-th {
-    background-color: #f8f9fa;
-    color: #495057;
-    font-weight: 600;
-}
-
-tr:hover {
-    background-color: #f8f9fa;
-}
-
-/* Адаптивность */
-@media (max-width: 768px) {
-    .navbar {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .nav-links {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-    
-    .features {
-        grid-template-columns: 1fr;
-    }
-    
-    table {
-        display: block;
-        overflow-x: auto;
-    }
-}
-
-/* Уведомления */
-.notification {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 1rem;
-    border-radius: 5px;
-    color: white;
-    z-index: 1000;
-    animation: slideIn 0.3s ease;
-}
-
-.notification.success {
-    background-color: #28a745;
-}
-
-.notification.error {
-    background-color: #dc3545;
-}
-
-.notification.info {
-    background-color: #00d4ff;
-}
-
-@keyframes slideIn {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
+p {
+    text-align: center;
+    color: #666;
 }
