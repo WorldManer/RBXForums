@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Доступ заблокирован</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="app">
+        <div class="ban-page">
+            <i class="fas fa-ban ban-icon"></i>
+            <h1>ДОСТУП ЗАБЛОКИРОВАН</h1>
+            
+            <div id="banInfo" class="ban-info">
+                <!-- Информация о бане загрузится сюда -->
+            </div>
+            
+            <a href="index.html" class="btn-primary">ВЕРНУТЬСЯ НА ГЛАВНУЮ</a>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        loadBanInfo();
+    </script>
+</body>
+</html>
