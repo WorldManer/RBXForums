@@ -3,92 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RBXForums — Главная</title>
+    <title>RBXForums - Главная</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="script.js"></script>
 </head>
 <body>
-    <div id="navbar-placeholder"></div>
+    <header>
+        <nav class="navbar">
+            <div class="logo">RBXForums</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="forum.html">Форум</a></li>
+                <li><a href="login.html">Вход</a></li>
+                <li><a href="register.html">Регистрация</a></li>
+            </ul>
+        </nav>
+    </header>
 
-    <div class="app">
-        <div class="hero">
-            <h1>ДОБРО ПОЖАЛОВАТЬ<br>НА <span>RBXFORUMS</span></h1>
-            <div class="subtitle">
-                Крупнейшее сообщество Roblox. Общайся, делись опытом, находи друзей.
+    <main class="container">
+        <h1>Добро пожаловать на RBXForums</h1>
+        <p>Крупнейшее сообщество Roblox в России</p>
+        
+        <div class="features">
+            <div class="feature-card">
+                <h3>Обсуждения</h3>
+                <p>Тысячи тем о Roblox</p>
             </div>
-            <button class="btn-primary" onclick="window.location.href='Pages/register.html'">ПРИСОЕДИНИТЬСЯ</button>
-
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-number" id="accountCounter">0</div>
-                    <div class="stat-label">ПОЛЬЗОВАТЕЛЕЙ</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" id="postsCounter">0</div>
-                    <div class="stat-label">СООБЩЕНИЙ</div>
-                </div>
+            <div class="feature-card">
+                <h3>Сообщество</h3>
+                <p>Более 10,000 активных пользователей</p>
+            </div>
+            <div class="feature-card">
+                <h3>Помощь</h3>
+                <p>Найди ответы на все вопросы</p>
             </div>
         </div>
+    </main>
 
-        <div class="features-grid">
-            <div class="feature-card">
-                <i class="fas fa-comments"></i>
-                <h3>ФОРУМ</h3>
-                <p>Обсуждай игры, делись новостями и находи единомышленников.</p>
-                <a href="Pages/forum.html" class="btn-secondary">ПЕРЕЙТИ</a>
-            </div>
-            <div class="feature-card">
-                <i class="fas fa-users"></i>
-                <h3>СООБЩЕСТВО</h3>
-                <p>Тысячи активных пользователей каждый день.</p>
-                <a href="Pages/users.html" class="btn-secondary">НАЙТИ ДРУЗЕЙ</a>
-            </div>
-            <div class="feature-card">
-                <i class="fas fa-gavel"></i>
-                <h3>ПРАВИЛА</h3>
-                <p>Ознакомься с правилами нашего сообщества.</p>
-                <a href="Pages/rules.html" class="btn-secondary">ЧИТАТЬ</a>
-            </div>
-            <div class="feature-card">
-                <i class="fas fa-shield-alt"></i>
-                <h3>БЕЗОПАСНОСТЬ</h3>
-                <p>Мы заботимся о безопасности наших пользователей.</p>
-                <a href="Pages/rules.html" class="btn-secondary">УЗНАТЬ</a>
-            </div>
-        </div>
-    </div>
-
-    <div id="footer-placeholder"></div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            await loadNavbarAndFooter();
-            await loadUsers();
-            await loadForumPosts();
-            await loadSession();
-            await updateCounters();
-            updateNavbar();
-        });
-
-        async function updateCounters() {
-            try {
-                const { count: userCount } = await supabase
-                    .from('users')
-                    .select('*', { count: 'exact', head: true });
-                
-                const { count: postCount } = await supabase
-                    .from('forum_posts')
-                    .select('*', { count: 'exact', head: true });
-                
-                document.getElementById('accountCounter').textContent = userCount || 0;
-                document.getElementById('postsCounter').textContent = postCount || 0;
-            } catch (error) {
-                console.error('Ошибка обновления счетчиков:', error);
-            }
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
