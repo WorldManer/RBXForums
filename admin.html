@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RBXForums — Админ-панель</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <div class="app">
+        <div class="admin-container">
+            <h2><i class="fas fa-shield-alt"></i> АДМИН-ПАНЕЛЬ</h2>
+            
+            <!-- Поиск пользователей -->
+            <div class="admin-panel-section">
+                <h3>ПОИСК ПОЛЬЗОВАТЕЛЯ</h3>
+                <div class="search-user">
+                    <input type="text" id="adminSearchUsername" placeholder="Введите ник" class="input-group">
+                    <button class="btn-primary" onclick="adminSearchUser()">НАЙТИ</button>
+                </div>
+                <div id="adminSearchResult"></div>
+            </div>
+
+            <!-- Управление баннером -->
+            <div class="admin-panel-section">
+                <h3>ГЛОБАЛЬНЫЙ БАННЕР</h3>
+                <input type="text" id="bannerText" class="input-group" placeholder="Текст баннера...">
+                <button class="btn-primary" onclick="publishBanner()">ОПУБЛИКОВАТЬ</button>
+            </div>
+
+            <!-- Режим обслуживания -->
+            <div class="admin-panel-section">
+                <h3>ТЕХНИЧЕСКИЕ РАБОТЫ</h3>
+                <button class="btn-primary" onclick="toggleMaintenance()">
+                    <i class="fas fa-tools"></i> ВКЛ/ВЫКЛ РЕЖИМ
+                </button>
+                <div style="margin-top: 10px;">
+                    <input type="text" id="whitelistUser" class="input-group" placeholder="Ник для белого списка">
+                    <button class="btn-secondary" onclick="addToWhitelist()">ДОБАВИТЬ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="script.js"></script>
+    <script>
+        loadNavbarAndFooter();
+        
+        // Проверка прав доступа
+        if (!currentUser || currentUser.role !== 'admin') {
+            window.location.href = '403.html';
+        }
+    </script>
+</body>
+</html>
