@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RBXForums — Форум</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <div class="app">
+        <div class="forum-container">
+            <div class="forum-header">
+                <h2><i class="fas fa-comments"></i> ФОРУМ</h2>
+                <button class="forum-create-btn" onclick="checkAuthAndCreate()">
+                    <i class="fas fa-plus"></i> СОЗДАТЬ ТЕМУ
+                </button>
+            </div>
+
+            <div id="createPostPanel" class="forum-create-panel hidden">
+                <h3>НОВАЯ ТЕМА</h3>
+                <input type="text" id="postTitle" placeholder="Заголовок" class="input-group">
+                <textarea id="postContent" placeholder="Текст сообщения..." class="input-group"></textarea>
+                <button class="btn-primary" onclick="createPost()">ОПУБЛИКОВАТЬ</button>
+                <button class="btn-secondary" onclick="hideCreatePost()">ОТМЕНА</button>
+            </div>
+
+            <div id="postsList" class="forum-posts">
+                <!-- Посты будут загружаться сюда -->
+            </div>
+        </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="script.js"></script>
+    <script>
+        loadNavbarAndFooter();
+        loadForumPosts();
+        
+        function checkAuthAndCreate() {
+            if (!currentUser) {
+                window.location.href = 'login.html';
+                return;
+            }
+            if (currentUser.banned) {
+                alert('Вы забанены и не можете создавать посты');
+                return;
+            }
+            document.getElementById('createPostPanel').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
