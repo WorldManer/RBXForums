@@ -34,14 +34,19 @@
     </div>
 
     <div id="footer-placeholder"></div>
-
+    <!-- Сначала Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Потом наш скрипт -->
     <script src="script.js"></script>
     <script>
-        loadNavbarAndFooter();
-        loadForumPosts();
+        // Ждем загрузки
+        setTimeout(() => {
+            loadNavbarAndFooter();
+            loadForumPosts();
+        }, 500);
         
         function checkAuthAndCreate() {
-            if (!currentUser) {
+            if (typeof currentUser === 'undefined' || !currentUser) {
                 window.location.href = 'login.html';
                 return;
             }
@@ -50,6 +55,49 @@
                 return;
             }
             document.getElementById('createPostPanel').classList.remove('hidden');
+        }
+        
+        function hideCreatePost() {
+            document.getElementById('createPostPanel').classList.add('hidden');
+        }
+        
+        async function createPost() {
+            if (!currentUser) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            const title = document.getElementById('postTitle').value;
+            const content = document.getElementById('postContent').value;
+            
+            if (!title || !content) {
+                alert('Заполните все поля');
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabase
+                    .from('forum_posts')
+                    .insert([{
+                        user_id: currentUser.id,
+                        username: currentUser.username,
+                        roblox_nick: currentUser.roblox_nick || currentUser.username,
+                        title: title,
+                        content: content,
+                        created_at: new Date().toISOString(),
+                        comments: []
+                    }]);
+                
+                if (error) {
+                    console.error('Ошибка:', error);
+                    alert('Ошибка при создании поста');
+                } else {
+                    window.location.href = 'forum.html';
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Ошибка при создании поста');
+            }
         }
     </script>
 </body>
