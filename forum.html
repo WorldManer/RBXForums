@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RBXForums - Форум</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">RBXForums</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="forum.html">Форум</a></li>
+                <li><a href="admin.html">Админ панель</a></li>
+                <li><a href="#" id="logoutBtn">Выход</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Форум RBXForums</h1>
+        
+        <div class="forum-categories">
+            <div class="category">
+                <h2>Общие обсуждения</h2>
+                <div class="topics">
+                    <div class="topic">
+                        <h3>Добро пожаловать на форум!</h3>
+                        <p>Автор: Admin | Ответов: 15</p>
+                    </div>
+                    <div class="topic">
+                        <h3>Как заработать робуксы?</h3>
+                        <p>Автор: User123 | Ответов: 8</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category">
+                <h2>Разработка игр</h2>
+                <div class="topics">
+                    <div class="topic">
+                        <h3>Обучение Lua скриптингу</h3>
+                        <p>Автор: Developer | Ответов: 23</p>
+                    </div>
+                    <div class="topic">
+                        <h3>Проблемы с физикой</h3>
+                        <p>Автор: Creator | Ответов: 4</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category">
+                <h2>Торговля</h2>
+                <div class="topics">
+                    <div class="topic">
+                        <h3>Купить/Прдать лимитедки</h3>
+                        <p>Автор: Trader | Ответов: 12</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="create-topic">
+            <h3>Создать новую тему</h3>
+            <form id="createTopicForm">
+                <div class="form-group">
+                    <input type="text" id="topicTitle" placeholder="Заголовок темы" required>
+                </div>
+                <div class="form-group">
+                    <textarea id="topicContent" placeholder="Содержание" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Создать тему</button>
+            </form>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
