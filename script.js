@@ -1,206 +1,308 @@
-// ========== НАСТРОЙКИ SUPABASE ==========
-const SUPABASE_URL = 'https://ziwubecvahvlxxleqjid.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_b6_Wtue4ArK0M4cWFp5KfA_pD3E0QN2';
-
-// Глобальные переменные
-let currentUser = null;
-let users = [];
-let forumPosts = [];
-
 // Инициализация Supabase
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseUrl = 'https://ygpczdorqtoxchgwtcdu.supabase.co';
+const supabaseKey = 'sb_publishable_QWZrAGxsXt0xtot2lFdz3A_tOWokALJ';
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-// ========== ЗАГРУЗКА НАВИГАЦИИ ==========
-async function loadNavbarAndFooter() {
-    try {
-        // Загружаем навбар
-        const navbarResponse = await fetch('navbar.html');
-        const navbarHtml = await navbarResponse.text();
-        document.getElementById('navbar-placeholder').innerHTML = navbarHtml;
+// Функция для показа уведомлений
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+// Проверка авторизации
+async function checkAuth() {
+    const { data: { user } } = await supabase.auth.getUser();
+    return user;
+}
+
+// Проверка прав администратора
+async function checkAdmin() {
+    const user = await checkAuth();
+    if (!user) return false;
+    
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single();
+    
+    return data?.is_admin || false;
+}
+
+// Регистрация
+if (document.getElementById('registerForm')) {
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
         
-        // Загружаем футер
-        const footerResponse = await fetch('footer.html');
-        const footerHtml = await footerResponse.text();
-        document.getElementById('footer-placeholder').innerHTML = footerHtml;
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        
+        if (password !== confirmPassword) {
+            showNotification('Пароли не совпадают', 'error');
+            return;
+        }
+        
+        try {
+            const { data, error } = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        username: username
+                    }
+                }
+            });
+            
+            if (error) throw error;
+            
+            // Создаем профиль пользователя
+            if (data.user) {
+                await supabase.from('profiles').insert([
+                    {
+                        id: data.user.id,
+                        username: username,
+                        email: email,
+                        is_admin: false
+                    }
+                ]);
+            }
+            
+            showNotification('Регистрация успешна! Проверьте email для подтверждения', 'success');
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 2000);
+        } catch (error) {
+            showNotification(error.message, 'error');
+        }
+    });
+}
+
+// Вход
+if (document.getElementById('loginForm')) {
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password
+            });
+            
+            if (error) throw error;
+            
+            showNotification('Вход выполнен успешно!', 'success');
+            setTimeout(() => {
+                window.location.href = 'forum.html';
+            }, 1000);
+        } catch (error) {
+            showNotification(error.message, 'error');
+        }
+    });
+}
+
+// Выход
+if (document.getElementById('logoutBtn')) {
+    document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+        e.preventDefault();
+        
+        try {
+            const { error } = await supabase.auth.signOut();
+            if (error) throw error;
+            
+            showNotification('Выход выполнен', 'info');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1000);
+        } catch (error) {
+            showNotification(error.message, 'error');
+        }
+    });
+}
+
+// Защита админ панели
+if (window.location.pathname.includes('admin.html')) {
+    (async () => {
+        const isAdmin = await checkAdmin();
+        if (!isAdmin) {
+            window.location.href = 'forum.html';
+        } else {
+            // Загружаем данные для админ панели
+            await loadAdminData();
+        }
+    })();
+}
+
+// Загрузка данных для админ панели
+async function loadAdminData() {
+    try {
+        // Загружаем пользователей
+        const { data: users, error: usersError } = await supabase
+            .from('profiles')
+            .select('*');
+        
+        if (usersError) throw usersError;
+        
+        document.getElementById('userCount').textContent = users.length;
+        
+        const usersTableBody = document.getElementById('usersTableBody');
+        if (usersTableBody) {
+            usersTableBody.innerHTML = users.map(user => `
+                <tr>
+                    <td>${user.id}</td>
+                    <td>${user.username}</td>
+                    <td>${user.email}</td>
+                    <td>${user.is_admin ? 'Админ' : 'Пользователь'}</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" onclick="toggleAdmin('${user.id}')">
+                            ${user.is_admin ? 'Убрать админа' : 'Сделать админом'}
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteUser('${user.id}')">
+                            Удалить
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Загружаем темы форума
+        const { data: topics, error: topicsError } = await supabase
+            .from('topics')
+            .select('*');
+        
+        if (topicsError) throw topicsError;
+        
+        document.getElementById('topicCount').textContent = topics.length;
+        
+        const topicsTableBody = document.getElementById('topicsTableBody');
+        if (topicsTableBody) {
+            topicsTableBody.innerHTML = topics.map(topic => `
+                <tr>
+                    <td>${topic.id}</td>
+                    <td>${topic.title}</td>
+                    <td>${topic.author}</td>
+                    <td>${new Date(topic.created_at).toLocaleDateString()}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="deleteTopic('${topic.id}')">
+                            Удалить
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
     } catch (error) {
-        console.error('Ошибка загрузки навигации:', error);
+        showNotification(error.message, 'error');
     }
 }
 
-// ========== ЗАГРУЗКА ДАННЫХ ==========
-async function loadUsers() {
-    try {
-        const { data } = await supabase.from('users').select('*');
-        if (data) {
-            users = data.map(user => ({
-                ...user,
-                banned: user.banned && (!user.ban_expires || new Date(user.ban_expires) > new Date())
-            }));
-        }
-    } catch (e) {
-        console.log('Ошибка загрузки пользователей:', e);
-    }
-}
-
-async function loadForumPosts() {
-    try {
-        const { data } = await supabase
-            .from('forum_posts')
-            .select('*')
-            .order('created_at', { ascending: false });
+// Создание темы на форуме
+if (document.getElementById('createTopicForm')) {
+    document.getElementById('createTopicForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
         
-        if (data) {
-            forumPosts = data;
-        }
-    } catch (error) {
-        console.error('Ошибка загрузки постов:', error);
-    }
-}
-
-// ========== СЕССИЯ ==========
-async function loadSession() {
-    const sessionStr = localStorage.getItem('rbxforum_session');
-    if (!sessionStr) return null;
-    
-    try {
-        const session = JSON.parse(sessionStr);
-        const user = users.find(u => u.id === session.id);
-        
-        if (user && !user.banned) {
-            currentUser = user;
-            updateNavbar();
-            return user;
-        }
-    } catch (e) {
-        console.error('Ошибка загрузки сессии:', e);
-    }
-    
-    localStorage.removeItem('rbxforum_session');
-    return null;
-}
-
-function saveSession(user) {
-    const sessionData = {
-        id: user.id,
-        username: user.username,
-        loginTime: new Date().toISOString()
-    };
-    localStorage.setItem('rbxforum_session', JSON.stringify(sessionData));
-}
-
-function clearSession() {
-    localStorage.removeItem('rbxforum_session');
-}
-
-// ========== НАВИГАЦИЯ ==========
-function updateNavbar() {
-    const userArea = document.getElementById('userArea');
-    const adminTab = document.getElementById('adminTabLink');
-    
-    if (!userArea) return;
-    
-    if (currentUser) {
-        userArea.innerHTML = `
-            <span onclick="window.location.href='Pages/profile.html?id=${currentUser.id}'">
-                <i class="fas fa-user"></i> ${currentUser.username}
-            </span>
-            <button class="logout-btn" onclick="logout()">ВЫЙТИ</button>
-        `;
-        
-        if (adminTab) {
-            adminTab.style.display = currentUser.role === 'admin' ? 'inline-block' : 'none';
-            adminTab.onclick = () => window.location.href = 'Pages/admin.html';
-        }
-    } else {
-        userArea.innerHTML = `
-            <div class="auth-buttons">
-                <button onclick="window.location.href='Pages/login.html'">ВХОД</button>
-                <button onclick="window.location.href='Pages/register.html'">РЕГИСТРАЦИЯ</button>
-            </div>
-        `;
-        if (adminTab) adminTab.style.display = 'none';
-    }
-}
-
-// ========== АВТОРИЗАЦИЯ ==========
-async function loginUser(username, password) {
-    try {
-        const user = users.find(u => u.username === username && u.password === password);
-        
+        const user = await checkAuth();
         if (!user) {
-            return { error: 'Неверное имя или пароль' };
+            showNotification('Необходимо войти в систему', 'error');
+            window.location.href = 'login.html';
+            return;
         }
         
-        if (user.banned) {
-            return { error: 'Аккаунт заблокирован' };
+        const title = document.getElementById('topicTitle').value;
+        const content = document.getElementById('topicContent').value;
+        
+        try {
+            const { data, error } = await supabase
+                .from('topics')
+                .insert([
+                    {
+                        title: title,
+                        content: content,
+                        author_id: user.id,
+                        author: user.user_metadata.username
+                    }
+                ]);
+            
+            if (error) throw error;
+            
+            showNotification('Тема создана успешно!', 'success');
+            document.getElementById('createTopicForm').reset();
+            
+            // Перезагружаем список тем
+            loadTopics();
+        } catch (error) {
+            showNotification(error.message, 'error');
         }
-        
-        currentUser = user;
-        saveSession(user);
-        updateNavbar();
-        
-        return { success: true };
-    } catch (error) {
-        return { error: 'Ошибка входа' };
-    }
+    });
 }
 
-async function registerUser(username, password, robloxNick) {
+// Функции для админ панели
+async function toggleAdmin(userId) {
     try {
-        // Проверка уникальности
-        if (users.find(u => u.username === username)) {
-            return { error: 'Имя пользователя уже занято' };
-        }
+        const { data: user, error: fetchError } = await supabase
+            .from('profiles')
+            .select('is_admin')
+            .eq('id', userId)
+            .single();
         
-        const newUser = {
-            username,
-            password,
-            roblox_nick: robloxNick,
-            role: 'user',
-            banned: false,
-            bio: '',
-            created_at: new Date().toISOString()
-        };
+        if (fetchError) throw fetchError;
         
-        const { data, error } = await supabase.from('users').insert([newUser]).select();
+        const { error } = await supabase
+            .from('profiles')
+            .update({ is_admin: !user.is_admin })
+            .eq('id', userId);
         
-        if (error) {
-            return { error: 'Ошибка при регистрации' };
-        }
+        if (error) throw error;
         
-        await loadUsers();
-        return { success: true };
+        showNotification('Права пользователя обновлены', 'success');
+        loadAdminData();
     } catch (error) {
-        return { error: 'Ошибка регистрации' };
+        showNotification(error.message, 'error');
     }
 }
 
-function logout() {
-    currentUser = null;
-    clearSession();
-    window.location.href = 'index.html';
+async function deleteUser(userId) {
+    if (!confirm('Вы уверены, что хотите удалить этого пользователя?')) return;
+    
+    try {
+        const { error } = await supabase
+            .from('profiles')
+            .delete()
+            .eq('id', userId);
+        
+        if (error) throw error;
+        
+        // Также удаляем пользователя из auth (требует прав администратора Supabase)
+        showNotification('Пользователь удален', 'success');
+        loadAdminData();
+    } catch (error) {
+        showNotification(error.message, 'error');
+    }
 }
 
-// ========== УТИЛИТЫ ==========
-function formatDate(dateString) {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diff = now - date;
+async function deleteTopic(topicId) {
+    if (!confirm('Вы уверены, что хотите удалить эту тему?')) return;
     
-    if (diff < 60000) {
-        return 'только что';
+    try {
+        const { error } = await supabase
+            .from('topics')
+            .delete()
+            .eq('id', topicId);
+        
+        if (error) throw error;
+        
+        showNotification('Тема удалена', 'success');
+        loadAdminData();
+    } catch (error) {
+        showNotification(error.message, 'error');
     }
-    
-    if (diff < 3600000) {
-        const minutes = Math.floor(diff / 60000);
-        return `${minutes} ${minutes === 1 ? 'минуту' : 'минуты'} назад`;
-    }
-    
-    if (diff < 86400000) {
-        const hours = Math.floor(diff / 3600000);
-        return `${hours} ${hours === 1 ? 'час' : 'часа'} назад`;
-    }
-    
-    const months = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
-    return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
 }
