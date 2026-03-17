@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RBXForums — Главная</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <div class="app">
+        <div class="hero">
+            <h1>ДОБРО ПОЖАЛОВАТЬ<br>НА <span>RBXFORUMS</span></h1>
+            <div class="subtitle">
+                Крупнейшее сообщество Roblox. Общайся, делись опытом, находи друзей.
+            </div>
+            <button class="btn-primary" onclick="window.location.href='register.html'">ПРИСОЕДИНИТЬСЯ</button>
+
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" id="accountCounter">0</div>
+                    <div class="stat-label">ПОЛЬЗОВАТЕЛЕЙ</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="postsCounter">0</div>
+                    <div class="stat-label">СООБЩЕНИЙ</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fas fa-comments"></i>
+                <h3>ФОРУМ</h3>
+                <p>Обсуждай игры, делись новостями и находи единомышленников.</p>
+                <a href="forum.html" class="btn-secondary">ПЕРЕЙТИ</a>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-user-friends"></i>
+                <h3>СООБЩЕСТВО</h3>
+                <p>Тысячи активных пользователей каждый день.</p>
+                <a href="users.html" class="btn-secondary">НАЙТИ ДРУЗЕЙ</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="script.js"></script>
+    <script>
+        loadNavbarAndFooter();
+        updateCounters();
+    </script>
+</body>
+</html>
