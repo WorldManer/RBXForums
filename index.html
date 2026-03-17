@@ -6,6 +6,9 @@
     <title>RBXForums — Главная</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
 </head>
 <body>
     <div id="navbar-placeholder"></div>
@@ -16,7 +19,7 @@
             <div class="subtitle">
                 Крупнейшее сообщество Roblox. Общайся, делись опытом, находи друзей.
             </div>
-            <button class="btn-primary" onclick="window.location.href='register.html'">ПРИСОЕДИНИТЬСЯ</button>
+            <button class="btn-primary" onclick="window.location.href='Pages/register.html'">ПРИСОЕДИНИТЬСЯ</button>
 
             <div class="stats-grid">
                 <div class="stat-item">
@@ -35,23 +38,57 @@
                 <i class="fas fa-comments"></i>
                 <h3>ФОРУМ</h3>
                 <p>Обсуждай игры, делись новостями и находи единомышленников.</p>
-                <a href="forum.html" class="btn-secondary">ПЕРЕЙТИ</a>
+                <a href="Pages/forum.html" class="btn-secondary">ПЕРЕЙТИ</a>
             </div>
             <div class="feature-card">
-                <i class="fas fa-user-friends"></i>
+                <i class="fas fa-users"></i>
                 <h3>СООБЩЕСТВО</h3>
                 <p>Тысячи активных пользователей каждый день.</p>
-                <a href="users.html" class="btn-secondary">НАЙТИ ДРУЗЕЙ</a>
+                <a href="Pages/users.html" class="btn-secondary">НАЙТИ ДРУЗЕЙ</a>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-gavel"></i>
+                <h3>ПРАВИЛА</h3>
+                <p>Ознакомься с правилами нашего сообщества.</p>
+                <a href="Pages/rules.html" class="btn-secondary">ЧИТАТЬ</a>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-shield-alt"></i>
+                <h3>БЕЗОПАСНОСТЬ</h3>
+                <p>Мы заботимся о безопасности наших пользователей.</p>
+                <a href="Pages/rules.html" class="btn-secondary">УЗНАТЬ</a>
             </div>
         </div>
     </div>
 
     <div id="footer-placeholder"></div>
 
-    <script src="script.js"></script>
     <script>
-        loadNavbarAndFooter();
-        updateCounters();
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadNavbarAndFooter();
+            await loadUsers();
+            await loadForumPosts();
+            await loadSession();
+            await updateCounters();
+            updateNavbar();
+        });
+
+        async function updateCounters() {
+            try {
+                const { count: userCount } = await supabase
+                    .from('users')
+                    .select('*', { count: 'exact', head: true });
+                
+                const { count: postCount } = await supabase
+                    .from('forum_posts')
+                    .select('*', { count: 'exact', head: true });
+                
+                document.getElementById('accountCounter').textContent = userCount || 0;
+                document.getElementById('postsCounter').textContent = postCount || 0;
+            } catch (error) {
+                console.error('Ошибка обновления счетчиков:', error);
+            }
+        }
     </script>
 </body>
 </html>
