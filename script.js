@@ -1,22 +1,35 @@
 // ========== НАСТРОЙКИ SUPABASE ==========
-const SUPABASE_URL = 'https://ygpczdorqtoxchgwtcdu.supabase.co'; // ЗАМЕНИ!
-const SUPABASE_KEY = 'sb_publishable_QWZrAGxsXt0xtot2lFdz3A_tOWokALJ'; // ЗАМЕНИ!
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL = 'https://ziwubecvahvlxxleqjid.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_b6_Wtue4ArK0M4cWFp5KfA_pD3E0QN2';
 
-// ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
-let currentUser = null;
-let users = [];
-let forumPosts = [];
+// Проверяем что Supabase загружен
+if (typeof window.supabase === 'undefined') {
+    console.error('Supabase не загружен! Подключаю...');
+    // Если не загружен, подключаем через script
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+    script.onload = () => {
+        window.supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        initializeApp();
+    };
+    document.head.appendChild(script);
+} else {
+    window.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    initializeApp();
+}
 
-// ========== ИНИЦИАЛИЗАЦИЯ ==========
-document.addEventListener('DOMContentLoaded', async () => {
-    await loadUsers();
-    await loadForumPosts();
-    await loadSession();
-    await checkMaintenanceMode();
-    await checkBanStatus();
+// Инициализация приложения
+function initializeApp() {
+    console.log('Supabase подключен, инициализируем...');
+    loadUsers();
+    loadForumPosts();
+    loadSession();
+    checkMaintenanceMode();
+    checkBanStatus();
     updateNavbar();
-});
+}
+
+// Остальной код script.js ниже...
 
 // ========== НАВИГАЦИЯ ==========
 function loadNavbarAndFooter() {
