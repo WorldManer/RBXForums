@@ -26,7 +26,7 @@
             <form id="registerForm">
                 <div class="form-group">
                     <label for="username">Имя пользователя:</label>
-                    <input type="text" id="username" required minlength="3" maxlength="30">
+                    <input type="text" id="username" required>
                 </div>
                 <div class="form-group">
                     <label for="email">Email:</label>
@@ -34,11 +34,11 @@
                 </div>
                 <div class="form-group">
                     <label for="password">Пароль:</label>
-                    <input type="password" id="password" required minlength="6">
+                    <input type="password" id="password" required>
                 </div>
                 <div class="form-group">
                     <label for="confirmPassword">Подтверждение пароля:</label>
-                    <input type="password" id="confirmPassword" required minlength="6">
+                    <input type="password" id="confirmPassword" required>
                 </div>
                 <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
             </form>
@@ -47,84 +47,90 @@
     </main>
 
     <script>
-        // Инициализация Supabase
-        const supabaseUrl = 'https://ygpczdorqtoxchgwtcdu.supabase.co';
-        const supabaseKey = 'sb_publishable_QWZrAGxsXt0xtot2lFdz3A_tOWokALJ';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-        // Функция для показа уведомлений
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.textContent = message;
-            document.body.appendChild(notification);
+        // Ждем загрузки страницы
+        document.addEventListener('DOMContentLoaded', function() {
             
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-        }
-
-        // Регистрация
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+            // Подключение к Supabase
+            const supabaseUrl = 'https://ygpczdorqtoxchgwtcdu.supabase.co';
+            const supabaseKey = 'sb_publishable_QWZrAGxsXt0xtot2lFdz3A_tOWokALJ';
+            const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
             
-            const username = document.getElementById('username').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            
-            // Валидация
-            if (password !== confirmPassword) {
-                showNotification('Пароли не совпадают', 'error');
-                return;
+            // Функция уведомлений
+            function showMessage(text, type) {
+                const msg = document.createElement('div');
+                msg.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 15px 20px;
+                    background: ${type === 'error' ? '#f44336' : '#4CAF50'};
+                    color: white;
+                    border-radius: 5px;
+                    z-index: 9999;
+                `;
+                msg.textContent = text;
+                document.body.appendChild(msg);
+                setTimeout(() => msg.remove(), 3000);
             }
             
-            if (password.length < 6) {
-                showNotification('Пароль должен быть минимум 6 символов', 'error');
-                return;
-            }
-            
-            if (username.length < 3) {
-                showNotification('Имя пользователя должно быть минимум 3 символа', 'error');
-                return;
-            }
-            
-            try {
-                // Регистрация пользователя
-                const { data, error } = await supabase.auth.signUp({
-                    email: email,
-                    password: password,
-                    options: {
-                        data: {
-                            username: username
+            // Обработчик формы
+            document.getElementById('registerForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value;
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                // Проверка паролей
+                if (password !== confirmPassword) {
+                    showMessage('Пароли не совпадают!', 'error');
+                    return;
+                }
+                
+                if (password.length < 6) {
+                    showMessage('Пароль должен быть минимум 6 символов!', 'error');
+                    return;
+                }
+                
+                try {
+                    console.log('Попытка регистрации:', email);
+                    
+                    // Регистрация
+                    const { data, error } = await supabase.auth.signUp({
+                        email: email,
+                        password: password,
+                        options: {
+                            data: {
+                                username: username
+                            }
                         }
+                    });
+                    
+                    if (error) {
+                        console.error('Ошибка:', error);
+                        showMessage('Ошибка: ' + error.message, 'error');
+                        return;
                     }
-                });
-                
-                if (error) throw error;
-                
-                if (data.user) {
-                    showNotification('Регистрация успешна! Проверьте email для подтверждения', 'success');
                     
-                    // Очищаем форму
-                    document.getElementById('registerForm').reset();
+                    if (data.user) {
+                        console.log('Успех:', data);
+                        showMessage('Регистрация успешна! Проверьте email', 'success');
+                        
+                        // Очистка формы
+                        document.getElementById('registerForm').reset();
+                        
+                        // Перенаправление через 3 секунды
+                        setTimeout(() => {
+                            window.location.href = 'login.html';
+                        }, 3000);
+                    }
                     
-                    // Перенаправляем на страницу входа через 3 секунды
-                    setTimeout(() => {
-                        window.location.href = 'login.html';
-                    }, 3000);
+                } catch (err) {
+                    console.error('Критическая ошибка:', err);
+                    showMessage('Ошибка подключения к серверу', 'error');
                 }
-            } catch (error) {
-                console.error('Ошибка регистрации:', error);
-                
-                if (error.message.includes('already registered')) {
-                    showNotification('Этот email уже зарегистрирован', 'error');
-                } else if (error.message.includes('weak password')) {
-                    showNotification('Пароль слишком простой', 'error');
-                } else {
-                    showNotification('Ошибка: ' + error.message, 'error');
-                }
-            }
+            });
         });
     </script>
 </body>
