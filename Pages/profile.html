@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RBXForums — Профиль</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/script.js"></script>
 </head>
 <body>
     <div id="navbar-placeholder"></div>
@@ -18,20 +21,168 @@
 
     <div id="footer-placeholder"></div>
 
-    <script src="script.js"></script>
     <script>
-        loadNavbarAndFooter();
-        const urlParams = new URLSearchParams(window.location.search);
-        const userId = urlParams.get('id');
-        
-        if (!userId) {
-            if (currentUser) {
-                window.location.href = `profile.html?id=${currentUser.id}`;
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadNavbarAndFooter();
+            await loadUsers();
+            await loadSession();
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get('id');
+            
+            if (!userId) {
+                if (currentUser) {
+                    window.location.href = `profile.html?id=${currentUser.id}`;
+                } else {
+                    window.location.href = 'login.html';
+                }
             } else {
-                window.location.href = 'login.html';
+                await loadProfile(userId);
             }
-        } else {
-            loadProfile(userId);
+        });
+
+        async function loadProfile(userId) {
+            try {
+                const { data: user } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+                
+                if (user) {
+                    displayProfile(user);
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки профиля:', error);
+            }
+        }
+
+        function displayProfile(user) {
+            const isOwnProfile = currentUser && currentUser.id === user.id;
+            const isAdmin = currentUser?.role === 'admin';
+            const date = formatDate(user.created_at);
+            
+            const profileContainer = document.getElementById('profileContainer');
+            
+            profileContainer.innerHTML = `
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-info">
+                        <h2>${user.roblox_nick || user.username}</h2>
+                        ${user.bio ? `<div class="bio">"${user.bio}"</div>` : ''}
+                        <div class="post-meta">Аккаунт создан ${date}</div>
+                        ${user.banned ? '<div class="banned-status"><i class="fas fa-ban"></i> Пользователь заблокирован</div>' : ''}
+                    </div>
+                </div>
+                
+                <div class="profile-stats">
+                    <div class="stat-box">
+                        <div class="label">РОЛЬ</div>
+                        <div class="value">${user.role === 'admin' ? 'Администратор' : 'Пользователь'}</div>
+                    </div>
+                </div>
+                
+                ${isOwnProfile ? `
+                    <div class="profile-actions">
+                        <button class="btn-primary" onclick="showEditProfile()">РЕДАКТИРОВАТЬ</button>
+                    </div>
+                    
+                    <div id="editProfileSection" class="hidden">
+                        <h3>РЕДАКТИРОВАНИЕ ПРОФИЛЯ</h3>
+                        <textarea id="bioInput" class="input-group" placeholder="Расскажите о себе..." rows="4">${user.bio || ''}</textarea>
+                        <button class="btn-primary" onclick="updateBio('${user.id}')">СОХРАНИТЬ</button>
+                    </div>
+                ` : ''}
+                
+                ${isAdmin && !isOwnProfile && !user.banned ? `
+                    <div class="admin-panel-section">
+                        <h3>УПРАВЛЕНИЕ ПОЛЬЗОВАТЕЛЕМ</h3>
+                        <div class="ban-controls">
+                            <select id="banDuration" class="ban-duration">
+                                <option value="1">1 час</option>
+                                <option value="24">1 день</option>
+                                <option value="168">7 дней</option>
+                                <option value="720">30 дней</option>
+                                <option value="0">Навсегда</option>
+                            </select>
+                            <input type="text" id="banReason" class="ban-reason" placeholder="Причина бана">
+                            <button class="ban-button" onclick="banUser('${user.id}')">ЗАБАНИТЬ</button>
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${isAdmin && user.banned ? `
+                    <div class="admin-panel-section">
+                        <h3>УПРАВЛЕНИЕ ПОЛЬЗОВАТЕЛЕМ</h3>
+                        <button class="btn-primary" onclick="unbanUser('${user.id}')">РАЗБАНИТЬ</button>
+                    </div>
+                ` : ''}
+            `;
+        }
+
+        function showEditProfile() {
+            document.getElementById('editProfileSection').classList.remove('hidden');
+        }
+
+        async function updateBio(userId) {
+            const bio = document.getElementById('bioInput').value;
+            
+            try {
+                await supabase.from('users').update({ bio: bio }).eq('id', userId);
+                alert('Профиль обновлен');
+                window.location.reload();
+            } catch (error) {
+                alert('Ошибка обновления');
+            }
+        }
+
+        async function banUser(userId) {
+            const duration = document.getElementById('banDuration').value;
+            const reason = document.getElementById('banReason').value;
+            
+            if (!reason) {
+                alert('Введите причину бана');
+                return;
+            }
+            
+            const banExpires = parseInt(duration) === 0 ? null : 
+                new Date(Date.now() + parseInt(duration) * 60 * 60 * 1000).toISOString();
+            
+            try {
+                await supabase
+                    .from('users')
+                    .update({ 
+                        banned: true, 
+                        ban_reason: reason,
+                        ban_expires: banExpires 
+                    })
+                    .eq('id', userId);
+                
+                alert('Пользователь забанен');
+                window.location.reload();
+            } catch (error) {
+                alert('Ошибка бана');
+            }
+        }
+
+        async function unbanUser(userId) {
+            try {
+                await supabase
+                    .from('users')
+                    .update({ 
+                        banned: false, 
+                        ban_reason: null,
+                        ban_expires: null 
+                    })
+                    .eq('id', userId);
+                
+                alert('Пользователь разбанен');
+                window.location.reload();
+            } catch (error) {
+                alert('Ошибка разбана');
+            }
         }
     </script>
 </body>
