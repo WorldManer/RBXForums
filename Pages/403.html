@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>403 — Доступ запрещен</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
@@ -14,8 +14,42 @@
             <h1>403</h1>
             <h2>ДОСТУП ЗАПРЕЩЕН</h2>
             <p>У вас нет прав для просмотра этой страницы</p>
-            <a href="index.html" class="btn-primary">НА ГЛАВНУЮ</a>
+            <a href="/index.html" class="btn-primary">НА ГЛАВНУЮ</a>
         </div>
     </div>
+
+    <style>
+        .error-page {
+            text-align: center;
+            padding: 100px 20px;
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .error-icon {
+            font-size: 5rem;
+            color: #ff4d4f;
+            margin-bottom: 20px;
+        }
+        
+        .error-page h1 {
+            font-size: 4rem;
+            color: #ff4d4f;
+            margin-bottom: 10px;
+        }
+        
+        .error-page h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        
+        .error-page p {
+            color: #888;
+            margin-bottom: 30px;
+        }
+    </style>
 </body>
 </html>
