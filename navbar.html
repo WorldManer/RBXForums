@@ -1,15 +1,30 @@
 <nav class="navbar">
     <div class="navbar-left">
-        <div class="site-avatar" onclick="window.location.href='index.html'">
-            <img src="https://via.placeholder.com/60/000000/888888?text=RBX" alt="RBXForums">
+        <div class="site-avatar" onclick="window.location.href='/index.html'">
+            <div class="avatar-placeholder">RBX</div>
         </div>
-        <div class="logo" onclick="window.location.href='index.html'">RBXFORUMS</div>
+        <div class="logo" onclick="window.location.href='/index.html'">RBXFORUMS</div>
     </div>
     <div class="nav-links">
-        <a href="forum.html">ФОРУМ</a>
-        <a href="users.html">ПОЛЬЗОВАТЕЛИ</a>
-        <a href="rules.html">ПРАВИЛА</a>
-        <a href="admin.html" id="adminTabLink" style="display: none;">АДМИН</a>
+        <a href="/Pages/forum.html">ФОРУМ</a>
+        <a href="/Pages/users.html">ПОЛЬЗОВАТЕЛИ</a>
+        <a href="/Pages/rules.html">ПРАВИЛА</a>
+        <a href="/Pages/admin.html" id="adminTabLink" style="display: none;">АДМИН</a>
     </div>
     <div class="user-area" id="userArea"></div>
 </nav>
+
+<style>
+.avatar-placeholder {
+    width: 60px;
+    height: 60px;
+    background: #000;
+    border: 2px solid #888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-weight: bold;
+    font-size: 20px;
+}
+</style>
