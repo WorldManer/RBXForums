@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RBXForums — Вход</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <div class="app">
+        <div class="auth-container">
+            <div class="auth-box">
+                <h2>ВХОД НА САЙТ</h2>
+                
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <input type="text" id="loginUsername" placeholder="Имя пользователя" class="input-group" required>
+                    <input type="password" id="loginPassword" placeholder="Пароль" class="input-group" required>
+                    
+                    <button type="submit" class="btn-primary" style="width: 100%;">ВОЙТИ</button>
+                </form>
+                
+                <div id="loginError" class="error-message hidden"></div>
+                
+                <p style="margin-top: 20px; text-align: center;">
+                    Нет аккаунта? <a href="register.html">Зарегистрироваться</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="script.js"></script>
+    <script>
+        loadNavbarAndFooter();
+        
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const result = await loginUser(username, password);
+            
+            if (result.success) {
+                window.location.href = 'forum.html';
+            } else {
+                const errorDiv = document.getElementById('loginError');
+                errorDiv.textContent = result.error;
+                errorDiv.classList.remove('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
