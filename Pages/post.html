@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RBXForums — Просмотр темы</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/script.js"></script>
 </head>
 <body>
     <div id="navbar-placeholder"></div>
@@ -17,7 +20,7 @@
             </div>
 
             <div class="comments-section">
-                <div class="comments-title" id="commentsTitle">
+                <div class="comments-title">
                     <i class="fas fa-comments"></i> Комментарии
                 </div>
                 
@@ -26,7 +29,7 @@
                 </div>
 
                 <div id="addCommentForm" class="add-comment hidden">
-                    <textarea id="commentText" placeholder="Напишите комментарий..."></textarea>
+                    <textarea id="commentText" placeholder="Напишите комментарий..." rows="3"></textarea>
                     <button onclick="addComment()">ОТПРАВИТЬ</button>
                 </div>
             </div>
@@ -35,16 +38,137 @@
 
     <div id="footer-placeholder"></div>
 
-    <script src="script.js"></script>
     <script>
-        loadNavbarAndFooter();
-        const urlParams = new URLSearchParams(window.location.search);
-        const postId = urlParams.get('id');
-        
-        if (!postId) {
-            window.location.href = 'forum.html';
-        } else {
-            loadPost(postId);
+        let currentPostId = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadNavbarAndFooter();
+            await loadUsers();
+            await loadSession();
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            currentPostId = urlParams.get('id');
+            
+            if (!currentPostId) {
+                window.location.href = 'forum.html';
+            } else {
+                await loadPost(currentPostId);
+            }
+        });
+
+        async function loadPost(postId) {
+            try {
+                const { data: post } = await supabase
+                    .from('forum_posts')
+                    .select('*')
+                    .eq('id', postId)
+                    .single();
+                
+                if (post) {
+                    displayPost(post);
+                    displayComments(post.comments || []);
+                    
+                    if (currentUser && !currentUser.banned) {
+                        document.getElementById('addCommentForm').classList.remove('hidden');
+                    }
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки поста:', error);
+            }
+        }
+
+        function displayPost(post) {
+            const date = formatDate(post.created_at);
+            const postContainer = document.getElementById('postContainer');
+            
+            postContainer.innerHTML = `
+                <div class="forum-post">
+                    <div class="post-author">
+                        <div class="author-avatar" onclick="window.location.href='profile.html?id=${post.user_id}'">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div>
+                            <h4 onclick="window.location.href='profile.html?id=${post.user_id}'">${post.roblox_nick || post.username}</h4>
+                            <div class="post-meta">${date}</div>
+                        </div>
+                    </div>
+                    <div class="post-title">${post.title}</div>
+                    <div class="post-content">${post.content.replace(/\n/g, '<br>')}</div>
+                </div>
+            `;
+        }
+
+        function displayComments(comments) {
+            const commentsList = document.getElementById('commentsList');
+            
+            if (comments.length === 0) {
+                commentsList.innerHTML = '<p style="color: #888; text-align: center;">Пока нет комментариев</p>';
+                return;
+            }
+
+            let html = '';
+            comments.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            
+            comments.forEach(comment => {
+                const date = formatDate(comment.created_at);
+                html += `
+                    <div class="comment">
+                        <div class="comment-header">
+                            <span class="comment-author" onclick="window.location.href='profile.html?id=${comment.user_id}'">
+                                ${comment.roblox_nick || comment.username}
+                            </span>
+                            <span class="comment-date">${date}</span>
+                        </div>
+                        <div class="comment-content">${comment.content.replace(/\n/g, '<br>')}</div>
+                    </div>
+                `;
+            });
+            
+            commentsList.innerHTML = html;
+        }
+
+        async function addComment() {
+            if (!currentUser) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            const commentText = document.getElementById('commentText').value;
+            
+            if (!commentText.trim()) {
+                alert('Введите комментарий');
+                return;
+            }
+            
+            try {
+                const { data: post } = await supabase
+                    .from('forum_posts')
+                    .select('comments')
+                    .eq('id', currentPostId)
+                    .single();
+                
+                const comments = post.comments || [];
+                comments.push({
+                    id: Date.now().toString(),
+                    user_id: currentUser.id,
+                    username: currentUser.username,
+                    roblox_nick: currentUser.roblox_nick || currentUser.username,
+                    content: commentText,
+                    created_at: new Date().toISOString()
+                });
+                
+                const { error } = await supabase
+                    .from('forum_posts')
+                    .update({ comments: comments })
+                    .eq('id', currentPostId);
+                
+                if (!error) {
+                    document.getElementById('commentText').value = '';
+                    await loadPost(currentPostId);
+                }
+            } catch (error) {
+                console.error('Ошибка добавления комментария:', error);
+            }
         }
     </script>
 </body>
